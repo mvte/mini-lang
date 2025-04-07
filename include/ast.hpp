@@ -4,8 +4,16 @@
 #include<memory>
 
 enum class TokenType {
-    INT, PLUS, MINUS, MUL, DIV, 
-    LPAREN, RPAREN, END
+    INT, 
+    PLUS, 
+    MINUS, 
+    MUL, 
+    DIV, 
+    LPAREN, 
+    RPAREN, 
+    END,
+    ASSIGN,
+    IDENTIFIER,
 };
 
 struct Token {
@@ -37,4 +45,19 @@ struct UnaryOpNode : ASTNode {
 
     UnaryOpNode(Token o, std::shared_ptr<ASTNode> n) 
         : op(std::move(o)), operand(std::move(n)) {}
+};
+
+struct AssignmentNode : ASTNode {
+    std::string name;
+    std::shared_ptr<ASTNode> value;
+    
+    AssignmentNode(std::string n, std::shared_ptr<ASTNode> v)
+        : name(std::move(n)), value(std::move(v)) {}
+};
+
+struct AccessNode : ASTNode {
+    std::string name;
+
+    AccessNode(std::string n)
+        : name(std::move(n)) {}
 };
