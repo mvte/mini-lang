@@ -52,6 +52,7 @@ std::vector<Token> tokenize(const std::string &input) {
         
         i++;
     }
-
+    
+    tokens.push_back({TokenType::END, ""});
     return tokens;
 }
