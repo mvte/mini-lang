@@ -32,12 +32,20 @@ int main(int argc, char*argv[]) {
     try {
         // turn the input into a token vector
         auto tokens = tokenize(input);
-        // parse the token vector into a tree
-        auto ast = parse(tokens);
-        // evaluate the tree
-        auto rslt = evaluate(ast);
-        // print the result
-        std::cout << rslt;
+        // parse the token vector into a list of statements
+        auto statements = parse(tokens);
+
+        // create the environment
+        std::unordered_map<std::string, int> env;
+
+        // execute the statements
+        int last = 0;
+        for (auto& stmt : statements) {
+            last = evaluate(stmt, env);
+        }
+
+        // print the latest result
+        std::cout << last;
     } catch (const std::exception &e) {
         std::cerr << "Error: " << e.what() << std::endl;
         return 1;
