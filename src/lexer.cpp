@@ -26,6 +26,16 @@ std::vector<Token> tokenize(const std::string &input) {
             continue;
         }
 
+        // beginning of an variable name (must start with letters only!)
+        if (std::isalpha(ch)) {
+            std::string ident;
+            while (i < input.size() && std::isalnum(input[i])) {
+                ident += input[i++];
+            }
+            tokens.push_back({TokenType::IDENTIFIER, ident});
+            continue;
+        }
+
         // tokenize other single character token types
         switch (ch) {
             case '+':
@@ -45,6 +55,9 @@ std::vector<Token> tokenize(const std::string &input) {
                 break;
             case ')':
                 tokens.push_back({TokenType::RPAREN, ")"});
+                break;
+            case '=':
+                tokens.push_back({TokenType::ASSIGN, "="});
                 break;
             default:
                 throw std::runtime_error("Unknown character: " + std::string(1, ch));
