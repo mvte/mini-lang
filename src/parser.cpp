@@ -6,6 +6,7 @@ static std::vector<Token> tkns;
 std::shared_ptr<ASTNode> term();
 std::shared_ptr<ASTNode> factor();
 std::shared_ptr<ASTNode> expression();
+std::shared_ptr<ASTNode> statement();
 
 // returns the current token
 Token peek() {
@@ -43,7 +44,7 @@ std::shared_ptr<ASTNode> expression() {
     return left;
 }
 
-// parses factors (integers and expressions inside parentheses)
+// parses factors (variables, integers, expressions inside parentheses)
 std::shared_ptr<ASTNode> factor() {
     Token tkn = peek();
     
@@ -65,6 +66,12 @@ std::shared_ptr<ASTNode> factor() {
         advance();
         return std::make_shared<NumNode>(std::stoi(tkn.value));
     } 
+
+    if (tkn.type == TokenType::IDENTIFIER) {
+        // consume the token and create an identifier node
+        advance();
+        return std::make_shared<AccessNode>(tkn.value);
+    }
     
     // parentheses
     if (tkn.type == TokenType::LPAREN) {
@@ -95,8 +102,34 @@ std::shared_ptr<ASTNode> term() {
     return left;
 }
 
-std::shared_ptr<ASTNode> parse(const std::vector<Token>& tokens) {
+std::shared_ptr<ASTNode> statement() {
+    // check for identifier token
+    if (peek().type == TokenType::IDENTIFIER && tkns[current + 1].type == TokenType::ASSIGN) {
+        // get name of identifier
+        std::string name = advance().value;
+        advance();
+        // parse expression for this identifier
+        auto expr = expression();
+        return std::make_shared<AssignmentNode>(name, expr);
+    }
+
+    // assignment with no identifier
+    if (peek().type == TokenType::ASSIGN) {
+        throw std::runtime_error("Variable name must start with a letter and cannot be empty");
+    }
+
+    // otherwise, just return the expression
+    return expression();
+}
+
+std::vector<std::shared_ptr<ASTNode>> parse(const std::vector<Token>& tokens) {
     tkns = tokens;
     current = 0;
-    return expression();
+
+    std::vector<std::shared_ptr<ASTNode>> statements;
+    while (peek().type != TokenType::END) {
+        statements.push_back(statement());
+    }
+    
+    return statements;
 }
