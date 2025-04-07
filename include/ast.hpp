@@ -30,3 +30,11 @@ struct BinOpNode : ASTNode {
     BinOpNode(std::shared_ptr<ASTNode> l, Token o, std::shared_ptr<ASTNode> r) 
         : left(std::move(l)), op(std::move(o)), right(std::move(r)) {}
 };
+
+struct UnaryOpNode : ASTNode {
+    Token op;
+    std::shared_ptr<ASTNode> operand;
+
+    UnaryOpNode(Token o, std::shared_ptr<ASTNode> n) 
+        : op(std::move(o)), operand(std::move(n)) {}
+};

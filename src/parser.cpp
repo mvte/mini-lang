@@ -46,11 +46,28 @@ std::shared_ptr<ASTNode> expression() {
 // parses factors (integers and expressions inside parentheses)
 std::shared_ptr<ASTNode> factor() {
     Token tkn = peek();
+    
+    // sign token
+    if (tkn.type == TokenType::PLUS || tkn.type == TokenType::MINUS) {
+        // consume the op token
+        Token op = advance();
+        // check if file ends unexpectedly
+        if (peek().type == TokenType::END) {
+            throw std::runtime_error("Unexpected end of input after unary operator");
+        }
+        auto operand = factor(); // compute the value of the next factor
+        return std::make_shared<UnaryOpNode>(op, operand);
+    }
+
+    // pure int
     if (tkn.type == TokenType::INT) {
         // consume the token and create a number node
         advance();
         return std::make_shared<NumNode>(std::stoi(tkn.value));
-    } else if (tkn.type == TokenType::LPAREN) {
+    } 
+    
+    // parentheses
+    if (tkn.type == TokenType::LPAREN) {
         // consume the token, and parse the tokens afterwards as an expression
         advance();
         auto node = expression();
@@ -78,7 +95,7 @@ std::shared_ptr<ASTNode> term() {
     return left;
 }
 
-std::shared_ptr<ASTNode> parse (const std::vector<Token>& tokens) {
+std::shared_ptr<ASTNode> parse(const std::vector<Token>& tokens) {
     tkns = tokens;
     current = 0;
     return expression();

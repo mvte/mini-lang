@@ -13,6 +13,21 @@ int evaluate(std::shared_ptr<ASTNode> node) {
         // note that dynamic cast expects a raw pointer, and returns that raw pointer (if the type checks out)
     }
 
+    // unary op node
+    if (auto unop = dynamic_cast<UnaryOpNode*>(node.get())) {
+        // evaluate the operand to some integer
+        int val = evaluate(unop->operand);
+        // apply the sign
+        switch(unop->op.type) {
+            case TokenType::MINUS:
+                return -val;
+            case TokenType::PLUS:
+                return val;
+            default:
+                throw std::runtime_error("Unknown unary operator");
+        }
+    }
+
     // bin op node
     if (auto binop = dynamic_cast<BinOpNode*>(node.get())) {
         // evaluate the left node
